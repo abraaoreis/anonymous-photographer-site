@@ -1,30 +1,58 @@
 # Anonymous Photographer Site
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Galeria de fotos anônima construída com Next.js, focada em alta resolução e privacidade.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/abraaoreis-projects/v0-anonymous-photographer-site)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/oT0DWoewJjb)
+## 🚀 Como Rodar o Projeto
 
-## Overview
+### Pré-requisitos
+- Node.js (v18+)
+- Docker e Docker Compose (para banco local)
+- Conta no Supabase (para produção)
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+### Passos
+1. **Configurar Variáveis de Ambiente**:
+   Crie um arquivo `.env.local` baseado no `.env.example`:
+   ```bash
+   cp .env.example .env.local
+   ```
+2. **Iniciar Banco de Dados Local**:
+   ```bash
+   docker-compose up -d
+   ```
+3. **Instalar Dependências**:
+   ```bash
+   npm install
+   ```
+4. **Rodar em Desenvolvimento**:
+   ```bash
+   npm run dev
+   ```
 
-## Deployment
+## 📁 Estrutura do Projeto
 
-Your project is live at:
+```
+/
+├── app/                # Rotas e API (Next.js App Router)
+├── components/         # Componentes React (UI, Gallery, Modals)
+├── lib/                # Configurações de terceiros (Supabase, Utils)
+├── scripts/            # Scripts SQL para migração
+├── server/             # Lógica de Backend (Clean Architecture)
+│   ├── models/         # Interfaces e Tipos
+│   ├── repositories/   # Acesso a Dados (Repository Pattern)
+│   └── services/       # Lógica de Negócio
+└── public/             # Ativos estáticos
+```
 
-**[https://vercel.com/abraaoreis-projects/v0-anonymous-photographer-site](https://vercel.com/abraaoreis-projects/v0-anonymous-photographer-site)**
+## 🛠 Tecnologias
+- **Frontend**: Next.js, Tailwind CSS, DaisyUI 5, Radix UI
+- **Backend**: Service Layer + Repository Pattern
+- **Banco de Dados**: PostgreSQL (Local/Docker) ou Supabase (Produção)
+- **Armazenamento**: Vercel Blob
 
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/oT0DWoewJjb](https://v0.app/chat/oT0DWoewJjb)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## ✅ Checklist de Implementação
+- [x] Migração de tipos para `server/models`
+- [x] Implementação do Repository Pattern
+- [x] Integração com DaisyUI 5
+- [x] Configuração de Banco de Dados Local (Docker)
+- [x] Gerenciamento de Variáveis de Ambiente e Estratégias de DB
+- [x] Documentação completa no README
