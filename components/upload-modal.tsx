@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { X, Upload, Loader2, ImagePlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useUploadPhoto } from "@/hooks/use-photos"
 
 interface UploadModalProps {
   isOpen: boolean
@@ -21,8 +21,9 @@ interface UploadModalProps {
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>("")
-  const [isUploading, setIsUploading] = useState(false)
   const { toast } = useToast()
+
+  const uploadMutation = useUploadPhoto()
 
   const [formData, setFormData] = useState({
     name: "",
@@ -42,12 +43,26 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
 
-      // Auto-preencher o nome com o nome do arquivo (sem extensão)
       if (!formData.name) {
         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "")
         setFormData({ ...formData, name: nameWithoutExt })
       }
     }
+  }
+
+  const resetForm = () => {
+    setSelectedFile(null)
+    setPreviewUrl("")
+    setFormData({
+      name: "",
+      category: "",
+      camera: "",
+      aperture: "",
+      lensType: "",
+      location: "",
+      description: "",
+      tags: "",
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,61 +86,35 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
       return
     }
 
-    setIsUploading(true)
+    const data = new FormData()
+    data.append("file", selectedFile)
+    data.append("name", formData.name)
+    data.append("category", formData.category)
+    data.append("camera", formData.camera)
+    data.append("aperture", formData.aperture)
+    data.append("lensType", formData.lensType)
+    data.append("location", formData.location)
+    data.append("description", formData.description)
+    data.append("tags", formData.tags)
 
-    try {
-      const data = new FormData()
-      data.append("file", selectedFile)
-      data.append("name", formData.name)
-      data.append("category", formData.category)
-      data.append("camera", formData.camera)
-      data.append("aperture", formData.aperture)
-      data.append("lensType", formData.lensType)
-      data.append("location", formData.location)
-      data.append("description", formData.description)
-      data.append("tags", formData.tags)
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || "Error al subir la imagen")
+    uploadMutation.mutate(data, {
+      onSuccess: () => {
+        toast({
+          title: "Foto enviada con éxito",
+          description: "Tu fotografía ha sido publicada en la galería",
+        })
+        resetForm()
+        onSuccess()
+        onClose()
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Error al subir la imagen",
+          variant: "destructive",
+        })
       }
-
-      toast({
-        title: "Foto enviada con éxito",
-        description: "Tu fotografía ha sido publicada en la galería",
-      })
-
-      // Reset form
-      setSelectedFile(null)
-      setPreviewUrl("")
-      setFormData({
-        name: "",
-        category: "",
-        camera: "",
-        aperture: "",
-        lensType: "",
-        location: "",
-        description: "",
-        tags: "",
-      })
-
-      onSuccess()
-      onClose()
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al subir la imagen",
-        variant: "destructive",
-      })
-    } finally {
-      setIsUploading(false)
-    }
+    })
   }
 
   const handleClose = () => {
@@ -292,8 +281,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             <Button type="button" variant="outline" onClick={handleClose} className="flex-1 bg-transparent">
               Cancelar
             </Button>
-            <Button type="submit" disabled={isUploading || !selectedFile} className="flex-1">
-              {isUploading ? (
+            <Button type="submit" disabled={uploadMutation.isPending || !selectedFile} className="flex-1">
+              {uploadMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Subiendo...

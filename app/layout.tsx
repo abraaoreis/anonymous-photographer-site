@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
+import { Providers } from "@/components/providers"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -11,7 +12,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Fotógrafo Anónimo",
   description:
-    "Comparte tus fotos de forma anónima. Sube imágenes de hasta 10MB con resolución entre 2-16 megapíxeles.",
+    "Comparte tus fotos de forma anónima. Sube imágenes de até 10MB com resolução entre 2-16 megapixels.",
   generator: "v0.app",
   icons: {
     icon: [
@@ -40,9 +41,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`font-sans antialiased`}>
-        {children}
-        <Analytics />
-        <Toaster />
+        <Providers>
+          {children}
+          <Analytics />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )

@@ -1,71 +1,35 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Search, Upload, ImageIcon, Loader2, Download, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { UploadModal } from "@/components/upload-modal"
+import { usePhotos } from "@/hooks/use-photos"
 
-interface Photo {
-  id: string
-  url: string
-  filename: string
-  name: string
-  category: string
-  size: number
-  width: number
-  height: number
-  megapixels: string
-  created_at: string
-  tags: string[]
-}
+const tags = [
+  { id: "all", label: "Todas" },
+  { id: "nature", label: "Naturaleza" },
+  { id: "urban", label: "Urbano" },
+  { id: "portrait", label: "Retrato" },
+  { id: "abstract", label: "Abstracto" },
+  { id: "architecture", label: "Arquitectura" },
+]
 
 export function PhotoGallery() {
-  const [photos, setPhotos] = useState<Photo[]>([])
   const [search, setSearch] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
+  const [appliedSearch, setAppliedSearch] = useState("")
   const [selectedTag, setSelectedTag] = useState<string>("all")
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-  const { toast } = useToast()
 
-  const fetchPhotos = async (searchQuery = "", tag = "all") => {
-    try {
-      const url = `/api/photos?search=${encodeURIComponent(searchQuery)}&tag=${encodeURIComponent(tag)}`
-      const response = await fetch(url)
-      const data = await response.json()
-      setPhotos(data.photos || [])
-    } catch (error) {
-      console.error("Error al cargar fotos:", error)
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las fotos",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchPhotos()
-  }, [])
+  const { data: photos = [], isLoading, refetch } = usePhotos({ search: appliedSearch, tag: selectedTag })
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchPhotos(search, selectedTag)
+    setAppliedSearch(search)
   }
-
-  const tags = [
-    { id: "all", label: "Todas" },
-    { id: "nature", label: "Naturaleza" },
-    { id: "urban", label: "Urbano" },
-    { id: "portrait", label: "Retrato" },
-    { id: "abstract", label: "Abstracto" },
-    { id: "architecture", label: "Arquitectura" },
-  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -130,10 +94,7 @@ export function PhotoGallery() {
                 key={tag.id}
                 variant={selectedTag === tag.id ? "default" : "outline"}
                 className="cursor-pointer px-4 py-2 text-sm whitespace-nowrap hover:bg-neutral-100 transition-colors"
-                onClick={() => {
-                  setSelectedTag(tag.id)
-                  fetchPhotos(search, tag.id)
-                }}
+                onClick={() => setSelectedTag(tag.id)}
               >
                 {tag.label}
               </Badge>
@@ -154,12 +115,12 @@ export function PhotoGallery() {
               <ImageIcon className="w-10 h-10 text-neutral-400" />
             </div>
             <h2 className="text-2xl font-semibold text-neutral-900 mb-2">
-              {search ? "No se encontraron fotos" : "No hay fotos todavía"}
+              {appliedSearch ? "No se encontraron fotos" : "No hay fotos todavía"}
             </h2>
             <p className="text-neutral-500">
-              {search
+              {appliedSearch
                 ? "Intenta con otra búsqueda o usa los filtros de arriba"
-                : "Haz clic en el botón 'Subir Foto' para compartir tu primera fotografía"}
+                : "Haz clic en el botão 'Subir Foto' para compartir tu primeira fotografa"}
             </p>
           </div>
         ) : (
@@ -207,7 +168,7 @@ export function PhotoGallery() {
       <UploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        onSuccess={() => fetchPhotos(search, selectedTag)}
+        onSuccess={() => refetch()}
       />
     </div>
   )

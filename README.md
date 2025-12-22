@@ -34,8 +34,9 @@ Galeria de fotos anônima construída com Next.js, focada em alta resolução e 
 /
 ├── app/                # Rotas e API (Next.js App Router)
 ├── components/         # Componentes React (UI, Gallery, Modals)
+├── hooks/              # Hooks customizados e lógica de estado (React Query)
 ├── lib/                # Configurações de terceiros (Supabase, Utils)
-├── scripts/            # Scripts SQL para migração
+├── services/           # Camada de serviço do Frontend
 ├── server/             # Lógica de Backend (Clean Architecture)
 │   ├── models/         # Interfaces e Tipos
 │   ├── repositories/   # Acesso a Dados (Repository Pattern)
