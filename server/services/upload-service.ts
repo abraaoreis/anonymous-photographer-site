@@ -1,9 +1,9 @@
 import { UploadResult } from "../models/photo"
-import { PhotoRepository } from "../repositories/photo-repository"
+import { PhotoRepositoryFactory } from "../repositories/photo-repository-factory"
 import { RepositoryFactory } from "../repositories/repository-factory"
 
 export class UploadService {
-    private static photoRepository = new PhotoRepository()
+    private static photoRepository = PhotoRepositoryFactory.getPhotoRepository()
     private static storageRepository = RepositoryFactory.getStorageRepository()
 
     private static async getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: number; height: number }> {
@@ -52,11 +52,11 @@ export class UploadService {
             filename: file.name,
             name,
             category,
-            camera: camera || null,
-            aperture: aperture || null,
-            lens_type: lensType || null,
-            location: location || null,
-            description: description || null,
+            camera: camera || undefined,
+            aperture: aperture || undefined,
+            lens_type: lensType || undefined,
+            location: location || undefined,
+            description: description || undefined,
             tags,
             size: file.size,
             width,

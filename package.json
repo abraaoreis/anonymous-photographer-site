@@ -1,14 +1,21 @@
 {
-  "name": "my-v0-project",
+  "name": "anonymous-photographer-site",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "dev:local": "docker-compose up && next dev",
+    "dev:supabase": "supabase start && next dev",
+    "build:local": "docker-compose up && next build",
+    "build:supabase": "supabase start && next build",
+    "start:local": "docker-compose up && next start",
+    "start:supabase": "supabase start && next start"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.958.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -52,6 +59,7 @@
     "lucide-react": "^0.454.0",
     "next": "16.0.10",
     "next-themes": "^0.4.6",
+    "pg": "^8.16.3",
     "react": "19.2.0",
     "react-day-picker": "9.8.0",
     "react-dom": "19.2.0",
@@ -67,6 +75,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
+    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "daisyui": "^5.5.14",

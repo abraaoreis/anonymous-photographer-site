@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { Photo, PhotoFilters } from "../models/photo"
+import { IPhotoRepository } from "./interfaces/photo-repository.interface"
 
-export class PhotoRepository {
+export class SupabasePhotoRepository implements IPhotoRepository {
     async findMany(filters: PhotoFilters = {}): Promise<Photo[]> {
         const { search, tag } = filters
         const supabase = await createClient()
