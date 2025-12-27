@@ -3,11 +3,20 @@ import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 import { UploadModalProps } from "./type-upload-modal"
 
+interface ImageData {
+    file: File;
+    width: number;
+    height: number;
+    hash: string;
+}
+
 
 
 const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [imageMetadata, setImageMetadata] = useState<{ width: number; height: number; hash: string } | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string>("")
+    const [successData, setSuccessData] = useState<{ id: string; contentHash: string } | null>(null)
     const { toast } = useToast()
 
     const uploadMutation = useUploadPhoto()
@@ -27,11 +36,17 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
         const file = e.target.files?.[0]
         if (file) {
             try {
-                // Resize image if needed (Max 4K)
-                const resizedFile = await resizeImage(file, 3840, 2160)
+                // Resize image if needed (Max 4K) and get metadata
+                const result = await processImage(file)
 
-                setSelectedFile(resizedFile)
-                const url = URL.createObjectURL(resizedFile)
+                setSelectedFile(result.file)
+                setImageMetadata({
+                    width: result.width,
+                    height: result.height,
+                    hash: result.hash
+                })
+
+                const url = URL.createObjectURL(result.file)
                 setPreviewUrl(url)
 
                 if (!formData.name) {
@@ -49,13 +64,22 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
         }
     }
 
-    const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<File> => {
+    const generateHash = async (file: File): Promise<string> => {
+        const arrayBuffer = await file.arrayBuffer()
+        const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
+        const hashArray = Array.from(new Uint8Array(hashBuffer))
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("")
+    }
+
+    const processImage = (file: File): Promise<ImageData> => {
         return new Promise((resolve, reject) => {
             const img = new Image()
             img.src = URL.createObjectURL(file)
-            img.onload = () => {
+            img.onload = async () => {
                 let width = img.width
                 let height = img.height
+                const maxWidth = 3840
+                const maxHeight = 2160
 
                 // Calculate new dimensions
                 if (width > maxWidth || height > maxHeight) {
@@ -66,10 +90,6 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
                         width = Math.round((width * maxHeight) / height)
                         height = maxHeight
                     }
-                } else {
-                    // No resize needed
-                    resolve(file)
-                    return
                 }
 
                 const canvas = document.createElement("canvas")
@@ -84,17 +104,28 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
 
                 ctx.drawImage(img, 0, 0, width, height)
 
-                canvas.toBlob((blob) => {
+                canvas.toBlob(async (blob) => {
                     if (blob) {
-                        const resizedFile = new File([blob], file.name, {
+                        const processedFile = new File([blob], file.name, {
                             type: file.type,
                             lastModified: Date.now(),
                         })
-                        resolve(resizedFile)
+
+                        try {
+                            const hash = await generateHash(processedFile)
+                            resolve({
+                                file: processedFile,
+                                width,
+                                height,
+                                hash
+                            })
+                        } catch (err) {
+                            reject(err)
+                        }
                     } else {
                         reject(new Error("Canvas to Blob conversion failed"))
                     }
-                }, file.type, 0.9) // 0.9 quality
+                }, file.type, 0.9)
             }
             img.onerror = (error) => reject(error)
         })
@@ -103,6 +134,7 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
     const resetForm = () => {
         setSelectedFile(null)
         setPreviewUrl("")
+        setSuccessData(null)
         setFormData({
             name: "",
             category: "",
@@ -147,15 +179,26 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
         data.append("description", formData.description)
         data.append("tags", formData.tags)
 
+        if (imageMetadata) {
+            data.append("width", imageMetadata.width.toString())
+            data.append("height", imageMetadata.height.toString())
+            data.append("hash", imageMetadata.hash)
+        }
+
         uploadMutation.mutate(data, {
-            onSuccess: () => {
+            onSuccess: (result) => {
                 toast({
                     title: "Foto enviada con éxito",
                     description: "Tu fotografía ha sido publicada en la galería",
                 })
-                resetForm()
+                if (result.id && result.contentHash) {
+                    setSuccessData({ id: result.id, contentHash: result.contentHash })
+                }
                 onSuccess()
-                onClose()
+                // Don't close immediately if we have success data to show
+                if (!result.contentHash) {
+                    onClose()
+                }
             },
             onError: (error) => {
                 toast({
@@ -185,6 +228,8 @@ const useUploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) => {
         previewUrl,
         setPreviewUrl,
         uploadMutation,
+        successData,
+        resetForm,
     }
 }
 

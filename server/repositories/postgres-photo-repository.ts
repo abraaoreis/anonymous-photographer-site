@@ -13,18 +13,18 @@ export class PostgresPhotoRepository implements IPhotoRepository {
 
     async findMany(filters: PhotoFilters = {}): Promise<Photo[]> {
         const { search, tag } = filters
-        let query = "SELECT * FROM photos"
+        let query = "SELECT id, url, name, category, width, height, megapixels, tags, camera, aperture, lens_type, location, description FROM photos"
         const values: any[] = []
         const conditions: string[] = []
 
         if (search) {
             values.push(`%${search}%`)
-            conditions.push(`name ILIKE $${values.length}`)
+            conditions.push(`(name ILIKE $${values.length} OR description ILIKE $${values.length} OR category ILIKE $${values.length} OR content_hash ILIKE $${values.length})`)
         }
 
         if (tag && tag !== "all") {
             values.push(tag)
-            conditions.push(`$${values.length} = ANY(tags)`)
+            conditions.push(`(category = $${values.length} OR $${values.length} = ANY(tags))`)
         }
 
         if (conditions.length > 0) {
@@ -42,15 +42,16 @@ export class PostgresPhotoRepository implements IPhotoRepository {
         }
     }
 
-    async create(photoData: Partial<Photo>): Promise<void> {
+    async create(photoData: Partial<Photo>): Promise<Photo> {
         const columns = Object.keys(photoData)
         const values = Object.values(photoData)
         const placeholders = values.map((_, i) => `$${i + 1}`).join(", ")
 
-        const sql = `INSERT INTO photos (${columns.join(", ")}) VALUES (${placeholders})`
+        const sql = `INSERT INTO photos (${columns.join(", ")}) VALUES (${placeholders}) RETURNING *`
 
         try {
-            await this.pool.query(sql, values)
+            const { rows } = await this.pool.query(sql, values)
+            return rows[0] as Photo
         } catch (error) {
             console.error("Error in PostgresPhotoRepository.create:", error)
             throw new Error(`Error al guardar en base de datos local: ${error instanceof Error ? error.message : String(error)}`)

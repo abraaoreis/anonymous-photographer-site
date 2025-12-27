@@ -6,16 +6,6 @@ export class UploadService {
     private static photoRepository = PhotoRepositoryFactory.getPhotoRepository()
     private static storageRepository = RepositoryFactory.getStorageRepository()
 
-    private static async getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: number; height: number }> {
-        const blob = new Blob([arrayBuffer])
-        const imageBitmap = await createImageBitmap(blob)
-
-        return {
-            width: imageBitmap.width,
-            height: imageBitmap.height,
-        }
-    }
-
     static async uploadPhoto(formData: FormData): Promise<UploadResult> {
         const file = formData.get("file") as File
         const name = formData.get("name") as string
@@ -26,6 +16,9 @@ export class UploadService {
         const location = formData.get("location") as string
         const description = formData.get("description") as string
         const tagsString = formData.get("tags") as string
+        const width = parseInt(formData.get("width") as string || "0")
+        const height = parseInt(formData.get("height") as string || "0")
+        const hash = formData.get("hash") as string
 
         if (!file) throw new Error("No se proporcionó ningún archivo")
         if (!name || !category) throw new Error("El nombre y la categoría son obligatorios")
@@ -34,12 +27,10 @@ export class UploadService {
         const MAX_SIZE = 10 * 1024 * 1024
         if (file.size > MAX_SIZE) throw new Error("La imagen no puede superar los 10MB")
 
-        const arrayBuffer = await file.arrayBuffer()
-        const { width, height } = await this.getImageDimensions(arrayBuffer)
         const megapixels = (width * height) / 1000000
 
-        if (megapixels < 2) throw new Error("La resolución mínima es de 2 megapíxeles")
-        if (megapixels > 16) throw new Error("La resolución máxima es de 16 megapíxeles")
+        if (width === 0 || height === 0) throw new Error("Las dimensiones de la imagen no son válidas")
+        if (megapixels < 1) throw new Error("La resolución mínima es de 1 megapíxel")
 
         const blobUrl = await this.storageRepository.upload(file.name, file)
 
@@ -47,7 +38,7 @@ export class UploadService {
             ? tagsString.split(",").map((tag) => tag.trim()).filter((tag) => tag.length > 0)
             : []
 
-        await this.photoRepository.create({
+        const createdPhoto = await this.photoRepository.create({
             url: blobUrl,
             filename: file.name,
             name,
@@ -62,6 +53,7 @@ export class UploadService {
             width,
             height,
             megapixels: megapixels.toFixed(2),
+            content_hash: hash || undefined,
         })
 
         return {
@@ -71,6 +63,8 @@ export class UploadService {
             width,
             height,
             megapixels: megapixels.toFixed(2),
+            id: createdPhoto.id,
+            contentHash: createdPhoto.content_hash,
         }
     }
 }

@@ -34,7 +34,7 @@ export class S3StorageRepository implements IStorageRepository {
             await this.s3Client.send(command)
 
             // Construct public URL
-            const endpoint = process.env.NEXT_PUBLIC_STORAGE_URL || "http://localhost:9000/photos"
+            const endpoint = process.env.NEXT_PUBLIC_STORAGE_URL || `http://localhost:9000/${this.bucketName}`
             return `${endpoint}/${filename}`
         } catch (error) {
             console.error("Error uploading to S3/MinIO:", error)

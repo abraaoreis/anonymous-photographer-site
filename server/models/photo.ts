@@ -15,6 +15,7 @@ export interface Photo {
     lens_type?: string
     location?: string
     description?: string
+    content_hash?: string
 }
 
 export interface PhotoFilters {
@@ -29,4 +30,6 @@ export interface UploadResult {
     width: number
     height: number
     megapixels: string
+    id?: string
+    contentHash?: string
 }

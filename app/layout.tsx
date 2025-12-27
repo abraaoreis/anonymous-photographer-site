@@ -58,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable}`}>
+    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable}`} suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
         <Providers>
           {children}

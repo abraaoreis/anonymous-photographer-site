@@ -6,8 +6,8 @@ Galeria de fotos anônima construída com Next.js, focada em alta resolução e 
 
 ### Pré-requisitos
 - Node.js (v18+)
-- Docker e Docker Compose (para banco local)
-- Conta no Supabase (para produção)
+- Docker e Docker Compose (para banco local e storage MinIO)
+- Conta no Supabase ou AWS S3 (para produção)
 
 ### Passos
 1. **Configurar Variáveis de Ambiente**:
@@ -15,14 +15,19 @@ Galeria de fotos anônima construída com Next.js, focada em alta resolução e 
    ```bash
    cp .env.example .env.local
    ```
-2. **Iniciar Banco de Dados Local**:
+   *Nota: O projeto já vem configurado para usar MinIO localmente.*
+
+2. **Iniciar Infraestrutura Local (PostgreSQL & MinIO)**:
    ```bash
-   docker-compose up -d
+   npm run docker:up
    ```
+   *Isso iniciará o banco de dados e o storage local, criando automaticamente o bucket necessário.*
+
 3. **Instalar Dependências**:
    ```bash
    npm install
    ```
+
 4. **Rodar em Desenvolvimento**:
    ```bash
    npm run dev
@@ -48,12 +53,6 @@ Galeria de fotos anônima construída com Next.js, focada em alta resolução e 
 - **Frontend**: Next.js, Tailwind CSS, DaisyUI 5, Radix UI
 - **Backend**: Service Layer + Repository Pattern
 - **Banco de Dados**: PostgreSQL (Local/Docker) ou Supabase (Produção)
-- **Armazenamento**: Vercel Blob
+- **Armazenamento**: AWS S3 / MinIO (Local) ou Vercel Blob
+- **Infraestrutura**: Docker & Docker Compose
 
-## ✅ Checklist de Implementação
-- [x] Migração de tipos para `server/models`
-- [x] Implementação do Repository Pattern
-- [x] Integração com DaisyUI 5
-- [x] Configuração de Banco de Dados Local (Docker)
-- [x] Gerenciamento de Variáveis de Ambiente e Estratégias de DB
-- [x] Documentação completa no README
