@@ -1,4 +1,6 @@
-# Anonymous Photographer Site
+# silent shuter
+
+
 
 Galeria de fotos anônima construída com Next.js, focada em alta resolução e privacidade.
 
