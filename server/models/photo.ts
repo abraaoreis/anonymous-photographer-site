@@ -16,6 +16,8 @@ export interface Photo {
     location?: string
     description?: string
     content_hash?: string
+    views_count: number
+    downloads_count: number
 }
 
 export interface PhotoFilters {

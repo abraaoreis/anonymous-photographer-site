@@ -7,17 +7,21 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { usePhotoGallery } from "./use-photo-gallery"
 import { UploadModal } from "../upload-modal/upload-modal"
-
-const tags = [
-  { id: "all", label: "Todas" },
-  { id: "nature", label: "Naturaleza" },
-  { id: "urban", label: "Urbano" },
-  { id: "portrait", label: "Retrato" },
-  { id: "abstract", label: "Abstracto" },
-  { id: "architecture", label: "Arquitectura" },
-]
+import { PhotoDetailModal } from "./photo-detail-modal"
+import { useLanguage } from "@/lib/language-context"
+import { LanguageSwitcher } from "../language-switcher"
 
 export function PhotoGallery() {
+  const { t } = useLanguage()
+
+  const tags = [
+    { id: "all", label: t.search.tags.all },
+    { id: "nature", label: t.search.tags.nature },
+    { id: "urban", label: t.search.tags.urban },
+    { id: "portrait", label: t.search.tags.portrait },
+    { id: "abstract", label: t.search.tags.abstract },
+    { id: "architecture", label: t.search.tags.architecture },
+  ]
   const {
     search,
     setSearch,
@@ -30,23 +34,32 @@ export function PhotoGallery() {
     isLoading,
     refetch,
     handleSearch,
+    selectedPhoto,
+    isDetailModalOpen,
+    setIsDetailModalOpen,
+    detailModalMode,
+    openPreview,
+    openDownload,
   } = usePhotoGallery()
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       {/* Hero Section */}
-      <section className="bg-background py-20 border-b border-border">
+      <section className="bg-background py-20 border-b border-border relative">
+        <div className="absolute top-6 right-6">
+          <LanguageSwitcher />
+        </div>
         <div className="max-w-[1920px] mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-5xl font-title font-bold text-foreground">Fotógrafo Anónimo</h1>
+            <h1 className="text-5xl font-title font-bold text-foreground">{t.hero.title}</h1>
           </div>
           <p className="text-xl text-light-gray mb-8 max-w-2xl mx-auto font-sans">
-            Comparte tus mejores fotografías de forma anónima. Galería de imágenes de alta resolución para todos.
+            {t.hero.description}
           </p>
           <div className="mt-4">
             <button className="btn bg-shadow-red hover:bg-[#C43F3F] border-none text-white rounded-[8px] font-sans px-8" onClick={() => setIsUploadModalOpen(true)}>
               <Upload className="w-5 h-5 mr-2" />
-              Subir tu Foto</button>
+              {t.hero.uploadBtn}</button>
           </div>
         </div>
       </section>
@@ -60,7 +73,7 @@ export function PhotoGallery() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-light-gray" />
                 <Input
                   type="text"
-                  placeholder="Buscar fotos de alta resolución..."
+                  placeholder={t.search.placeholder}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-12 h-12 bg-mist-gray border-border text-foreground focus:bg-mist-gray/80 rounded-[16px] placeholder:text-light-gray"
@@ -70,7 +83,7 @@ export function PhotoGallery() {
 
             <Button className="h-12 px-6 bg-shadow-red hover:bg-[#C43F3F] text-white border-none rounded-[8px]" onClick={() => setIsUploadModalOpen(true)}>
               <Upload className="w-4 h-4 mr-2" />
-              Subir Foto
+              {t.search.uploadBtn}
             </Button>
           </div>
 
@@ -105,12 +118,12 @@ export function PhotoGallery() {
               <ImageIcon className="w-10 h-10 text-light-gray" />
             </div>
             <h2 className="text-2xl font-title font-semibold text-foreground mb-2">
-              {appliedSearch ? "No se encontraron fotos" : "No hay fotos todavía"}
+              {appliedSearch ? t.gallery.empty : t.gallery.empty}
             </h2>
             <p className="text-light-gray font-sans">
               {appliedSearch
-                ? "Intenta con otra búsqueda o usa los filtros de arriba"
-                : "Haz clic en el botão 'Subir Foto' para compartir tu primeira fotografa"}
+                ? t.gallery.emptyDescription
+                : t.gallery.uploadFirst}
             </p>
           </div>
         ) : (
@@ -118,6 +131,7 @@ export function PhotoGallery() {
             {photos.map((photo) => (
               <div
                 key={photo.id}
+                onClick={() => openPreview(photo)}
                 className="break-inside-avoid group relative overflow-hidden rounded-lg bg-card cursor-pointer hover:opacity-95 transition-all border border-[var(--card-border)] shadow-[var(--card-shadow)]"
               >
                 <img
@@ -138,16 +152,17 @@ export function PhotoGallery() {
                     </div>
                   </div>
 
-                  <a
-                    href={photo.url}
-                    download={photo.filename}
-                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => e.stopPropagation()}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 bg-soft-white/10 hover:bg-soft-white/20 text-soft-white border-none backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openDownload(photo)
+                    }}
                   >
-                    <Button size="sm" variant="secondary" className="h-8 w-8 p-0 bg-soft-white/10 hover:bg-soft-white/20 text-soft-white border-none backdrop-blur-sm">
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </a>
+                    <Download className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ))}
@@ -159,6 +174,13 @@ export function PhotoGallery() {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={() => refetch()}
+      />
+
+      <PhotoDetailModal
+        photo={selectedPhoto}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        mode={detailModalMode}
       />
     </div>
   )

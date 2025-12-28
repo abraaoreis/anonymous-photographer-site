@@ -13,7 +13,7 @@ export class PostgresPhotoRepository implements IPhotoRepository {
 
     async findMany(filters: PhotoFilters = {}): Promise<Photo[]> {
         const { search, tag } = filters
-        let query = "SELECT id, url, name, category, width, height, megapixels, tags, camera, aperture, lens_type, location, description FROM photos"
+        let query = "SELECT id, url, name, category, width, height, megapixels, tags, camera, aperture, lens_type, location, description, views_count, downloads_count FROM photos"
         const values: any[] = []
         const conditions: string[] = []
 
@@ -55,6 +55,36 @@ export class PostgresPhotoRepository implements IPhotoRepository {
         } catch (error) {
             console.error("Error in PostgresPhotoRepository.create:", error)
             throw new Error(`Error al guardar en base de datos local: ${error instanceof Error ? error.message : String(error)}`)
+        }
+    }
+
+    async findById(id: string): Promise<Photo | null> {
+        const query = "SELECT id, url, name, category, width, height, megapixels, tags, camera, aperture, lens_type, location, description, views_count, downloads_count FROM photos WHERE id = $1"
+        try {
+            const { rows } = await this.pool.query(query, [id])
+            if (rows.length === 0) return null
+            return rows[0] as Photo
+        } catch (error) {
+            console.error("Error in PostgresPhotoRepository.findById:", error)
+            throw new Error(`Error al buscar en base de datos local: ${error instanceof Error ? error.message : String(error)}`)
+        }
+    }
+
+    async incrementViews(id: string): Promise<void> {
+        const query = "UPDATE photos SET views_count = views_count + 1 WHERE id = $1"
+        try {
+            await this.pool.query(query, [id])
+        } catch (error) {
+            console.error("Error in PostgresPhotoRepository.incrementViews:", error)
+        }
+    }
+
+    async incrementDownloads(id: string): Promise<void> {
+        const query = "UPDATE photos SET downloads_count = downloads_count + 1 WHERE id = $1"
+        try {
+            await this.pool.query(query, [id])
+        } catch (error) {
+            console.error("Error in PostgresPhotoRepository.incrementDownloads:", error)
         }
     }
 }

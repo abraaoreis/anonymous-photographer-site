@@ -10,20 +10,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useUploadModal from "./use-upload-modal"
 import { UploadModalProps } from "./type-upload-modal"
+import { useLanguage } from "@/lib/language-context"
 
 
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
   const { handleFileSelect, handleSubmit, handleClose, formData, setFormData, selectedFile, setSelectedFile, previewUrl, setPreviewUrl, uploadMutation, successData, resetForm } = useUploadModal({ isOpen, onClose, onSuccess })
+  const { t } = useLanguage()
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{successData ? "¡Subida Exitosa!" : "Subir Fotografía"}</DialogTitle>
+          <DialogTitle>{successData ? t.modals.upload.successTitle : t.modals.upload.title}</DialogTitle>
           <DialogDescription>
             {successData
-              ? "Tu foto ha sido publicada. Guarda tu recibo digital para certificar tu autoria."
-              : "Completa los detalles de tu fotografía. Los campos obligatorios están marcados con *"}
+              ? t.modals.upload.successDescription
+              : t.modals.upload.description}
           </DialogDescription>
         </DialogHeader>
 
@@ -33,8 +35,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
               <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-10 h-10 text-green-500" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-1">Tu Recibo Digital</h3>
-              <p className="text-sm text-light-gray mb-6">Usa este hash para buscar tu foto o certificar que es tuya.</p>
+              <h3 className="text-lg font-bold text-foreground mb-1">{t.modals.upload.receiptTitle}</h3>
+              <p className="text-sm text-light-gray mb-6">{t.modals.upload.receiptDescription}</p>
 
               <div className="w-full relative group">
                 <div className="bg-urban-black p-4 rounded-md font-mono text-[10px] break-all border border-border text-soft-white/80 pr-12">
@@ -62,14 +64,14 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 }}
                 className="w-full bg-shadow-red hover:bg-[#C43F3F] text-white border-none"
               >
-                Cerrar Galerie
+                {t.modals.upload.buttons.close}
               </Button>
               <Button
                 variant="outline"
                 onClick={resetForm}
                 className="w-full border-border text-light-gray hover:text-foreground hover:bg-mist-gray/50"
               >
-                Subir otra foto
+                {t.modals.upload.buttons.uploadAnother}
               </Button>
             </div>
           </div>
@@ -77,7 +79,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* File Upload Area */}
             <div>
-              <Label htmlFor="photo-file" className="text-foreground font-sans font-medium">Foto *</Label>
+              <Label htmlFor="photo-file" className="text-foreground font-sans font-medium">{t.modals.upload.form.photo} *</Label>
               <div className="mt-2 text-foreground">
                 {previewUrl ? (
                   <div className="relative rounded-lg overflow-hidden border-2 border-border">
@@ -101,8 +103,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                     className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-light-gray hover:bg-mist-gray/50 transition-colors"
                   >
                     <ImagePlus className="w-12 h-12 text-light-gray mb-3" />
-                    <p className="text-sm text-foreground font-medium font-sans">Haz clic para seleccionar una foto</p>
-                    <p className="text-xs text-light-gray mt-1 font-mono">Máximo 10MB • 2-16 Megapixeles</p>
+                    <p className="text-sm text-foreground font-medium font-sans">{t.modals.upload.form.clickToSelect}</p>
+                    <p className="text-xs text-light-gray mt-1 font-mono">{t.modals.upload.form.constraints}</p>
                   </label>
                 )}
                 <input id="photo-file" type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -111,12 +113,12 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             {/* Name */}
             <div>
-              <Label htmlFor="name" className="text-foreground font-sans font-medium">Nombre de la Foto *</Label>
+              <Label htmlFor="name" className="text-foreground font-sans font-medium">{t.modals.upload.form.name} *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ej: Atardecer en la montaña"
+                placeholder={t.modals.upload.form.namePlaceholder}
                 required
                 className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
               />
@@ -124,20 +126,20 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             {/* Category */}
             <div>
-              <Label htmlFor="category" className="text-foreground font-sans font-medium">Categoría *</Label>
+              <Label htmlFor="category" className="text-foreground font-sans font-medium">{t.modals.upload.form.category} *</Label>
               <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                 <SelectTrigger className="mt-2 bg-mist-gray border-border text-foreground">
-                  <SelectValue placeholder="Selecciona una categoría" />
+                  <SelectValue placeholder={t.modals.upload.form.selectCategory} />
                 </SelectTrigger>
                 <SelectContent className="bg-mist-gray border-border text-foreground">
-                  <SelectItem value="nature">Naturaleza</SelectItem>
-                  <SelectItem value="urban">Urbano</SelectItem>
-                  <SelectItem value="portrait">Retrato</SelectItem>
-                  <SelectItem value="abstract">Abstracto</SelectItem>
-                  <SelectItem value="architecture">Arquitectura</SelectItem>
-                  <SelectItem value="wildlife">Vida Silvestre</SelectItem>
-                  <SelectItem value="street">Calle</SelectItem>
-                  <SelectItem value="landscape">Paisaje</SelectItem>
+                  <SelectItem value="nature">{t.search.tags.nature}</SelectItem>
+                  <SelectItem value="urban">{t.search.tags.urban}</SelectItem>
+                  <SelectItem value="portrait">{t.search.tags.portrait}</SelectItem>
+                  <SelectItem value="abstract">{t.search.tags.abstract}</SelectItem>
+                  <SelectItem value="architecture">{t.search.tags.architecture}</SelectItem>
+                  <SelectItem value="wildlife">{t.search.tags.wildlife}</SelectItem>
+                  <SelectItem value="street">{t.search.tags.street}</SelectItem>
+                  <SelectItem value="landscape">{t.search.tags.landscape}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -145,22 +147,22 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             {/* Camera Info Row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="camera" className="text-soft-white font-sans font-medium">Cámara</Label>
+                <Label htmlFor="camera" className="text-soft-white font-sans font-medium">{t.modals.upload.form.camera}</Label>
                 <Input
                   id="camera"
                   value={formData.camera}
                   onChange={(e) => setFormData({ ...formData, camera: e.target.value })}
-                  placeholder="Ej: Canon EOS R5"
+                  placeholder={t.modals.upload.form.cameraPlaceholder}
                   className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
                 />
               </div>
               <div>
-                <Label htmlFor="aperture" className="text-foreground font-sans font-medium">Apertura de Lente</Label>
+                <Label htmlFor="aperture" className="text-foreground font-sans font-medium">{t.modals.upload.form.aperture}</Label>
                 <Input
                   id="aperture"
                   value={formData.aperture}
                   onChange={(e) => setFormData({ ...formData, aperture: e.target.value })}
-                  placeholder="Ej: f/2.8"
+                  placeholder={t.modals.upload.form.aperturePlaceholder}
                   className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
                 />
               </div>
@@ -168,36 +170,36 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             {/* Lens Type */}
             <div>
-              <Label htmlFor="lensType" className="text-foreground font-sans font-medium">Tipo de Lente</Label>
+              <Label htmlFor="lensType" className="text-foreground font-sans font-medium">{t.modals.upload.form.lens}</Label>
               <Input
                 id="lensType"
                 value={formData.lensType}
                 onChange={(e) => setFormData({ ...formData, lensType: e.target.value })}
-                placeholder="Ej: 24-70mm f/2.8"
+                placeholder={t.modals.upload.form.lensPlaceholder}
                 className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
               />
             </div>
 
             {/* Location */}
             <div>
-              <Label htmlFor="location" className="text-foreground font-sans font-medium">Localización</Label>
+              <Label htmlFor="location" className="text-foreground font-sans font-medium">{t.modals.upload.form.location}</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Ej: Barcelona, España"
+                placeholder={t.modals.upload.form.locationPlaceholder}
                 className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
               />
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-soft-white font-sans font-medium">Descripción</Label>
+              <Label htmlFor="description" className="text-soft-white font-sans font-medium">{t.modals.upload.form.description}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Cuéntanos más sobre esta fotografía..."
+                placeholder={t.modals.upload.form.descriptionPlaceholder}
                 rows={3}
                 className="mt-2 resize-none bg-mist-gray border-mist-gray text-soft-white placeholder:text-light-gray"
               />
@@ -205,32 +207,32 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             {/* Tags */}
             <div>
-              <Label htmlFor="tags" className="text-soft-white font-sans font-medium">Tags</Label>
+              <Label htmlFor="tags" className="text-soft-white font-sans font-medium">{t.modals.upload.form.tags}</Label>
               <Input
                 id="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="Ej: atardecer, montaña, paisaje (separadas por comas)"
+                placeholder={t.modals.upload.form.tagsPlaceholder}
                 className="mt-2 bg-mist-gray border-border text-foreground placeholder:text-light-gray"
               />
-              <p className="text-[10px] text-light-gray mt-1 font-mono">Separa las etiquetas con comas</p>
+              <p className="text-[10px] text-light-gray mt-1 font-mono">{t.modals.upload.form.tagsHint}</p>
             </div>
 
             {/* Submit Button */}
             <div className="flex gap-3 pt-4">
               <Button type="button" variant="outline" onClick={handleClose} className="flex-1 bg-transparent border-[var(--secondary-button-border)] text-light-gray hover:border-foreground hover:text-foreground rounded-[8px]">
-                Cancelar
+                {t.modals.upload.buttons.cancel}
               </Button>
               <Button type="submit" disabled={uploadMutation.isPending || !selectedFile} className="flex-1 bg-shadow-red hover:bg-[#C43F3F] text-white border-none font-sans font-bold rounded-[8px]">
                 {uploadMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Subiendo...
+                    {t.modals.upload.buttons.uploading}
                   </>
                 ) : (
                   <>
                     <Upload className="w-4 h-4 mr-2" />
-                    Subir Foto
+                    {t.modals.upload.buttons.upload}
                   </>
                 )}
               </Button>

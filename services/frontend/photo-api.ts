@@ -29,4 +29,12 @@ export class PhotoApi {
 
         return response.json()
     }
+
+    static async recordView(id: string): Promise<void> {
+        await fetch(`/api/photos/${id}/view`, { method: "POST" })
+    }
+
+    static async recordDownload(id: string): Promise<void> {
+        await fetch(`/api/photos/${id}/download`, { method: "POST" })
+    }
 }
