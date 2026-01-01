@@ -6,14 +6,14 @@ export class S3StorageRepository implements IStorageRepository {
     private bucketName: string
 
     constructor() {
-        this.bucketName = process.env.S3_BUCKET_NAME || "photos"
+        this.bucketName = process.env.S3_BUCKET_NAME || "amzn-foto-anon-local"
         this.s3Client = new S3Client({
             region: process.env.S3_REGION || "us-east-1",
             endpoint: process.env.S3_ENDPOINT || "http://localhost:9000",
             forcePathStyle: true, // Needed for MinIO
             credentials: {
-                accessKeyId: process.env.S3_ACCESS_KEY || "minioadmin",
-                secretAccessKey: process.env.S3_SECRET_KEY || "minioadmin",
+                accessKeyId: process.env.S3_ACCESS_KEY || "AKIASMYOX2LPGLZLRGER",
+                secretAccessKey: process.env.S3_SECRET_KEY || "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",
             },
         })
     }

@@ -1,6 +1,6 @@
 export const pt = {
     hero: {
-        title: "Fotógrafo Anônimo",
+        title: "Silent Shutter",
         description: "Compartilhe suas melhores fotos anonimamente. Galeria de alta resolução para todos.",
         uploadBtn: "Enviar sua Foto"
     },
@@ -86,7 +86,7 @@ export const pt = {
             },
             donation: {
                 title: "Gostou desta foto?",
-                description: "Sua doação ajuda o Fotógrafo Anônimo a continuar capturando momentos incríveis de forma livre e gratuita."
+                description: "Sua doação ajuda o Silent Shutter a continuar capturando momentos incríveis de forma livre e gratuita."
             }
         }
     },

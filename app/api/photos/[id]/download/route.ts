@@ -3,10 +3,10 @@ import { PhotoService } from "@/server/services/photo-service"
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params
+        const { id } = await params
         await PhotoService.recordDownload(id)
         return NextResponse.json({ success: true })
     } catch (error) {

@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Space_Grotesk, IBM_Plex_Mono, Playfair_Display } from "next/font/google"
+import { Inter, Space_Grotesk, IBM_Plex_Mono, Playfair_Display, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
@@ -28,28 +28,61 @@ const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
 })
 
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+})
+
 export const metadata: Metadata = {
-  title: "Fotógrafo Anónimo",
+  title: {
+    default: "Silent Shutter",
+    template: "%s | Silent Shutter",
+  },
   description:
-    "Comparte tus fotos de forma anónima. Sube imágenes de até 10MB com resolução entre 2-16 megapixels.",
-  generator: "v0.app",
-  icons: {
-    icon: [
+    "Explore high-quality anonymous photography by Silent Shutter. Free stock photos for personal and commercial use.",
+  keywords: [
+    "photography",
+    "stock photos",
+    "anonymous",
+    "silent shutter",
+    "pexels",
+    "pinterest",
+    "free photos",
+    "high quality",
+    "art",
+    "gallery",
+    "creative commons",
+  ],
+  authors: [{ name: "Silent Shutter" }],
+  creator: "Silent Shutter",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://silent-shutter.APP_URL_PLACEHOLDER",
+    title: "Silent Shutter - Anonymous Photography",
+    description: "Explore high-quality anonymous photography by Silent Shutter. Free for personal and commercial use.",
+    siteName: "Silent Shutter",
+    images: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Silent Shutter Gallery",
       },
     ],
-    apple: "/apple-icon.png",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Silent Shutter",
+    description: "Explore high-quality anonymous photography by Silent Shutter.",
+    images: ["/og-image.jpg"],
+    creator: "@silentshutter",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://silent-shutter.com"),
 }
 
 export default function RootLayout({
@@ -58,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
         <Providers>
           {children}

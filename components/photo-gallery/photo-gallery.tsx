@@ -136,9 +136,15 @@ export function PhotoGallery() {
               >
                 <img
                   src={photo.url || "/placeholder.svg"}
-                  alt={photo.name || photo.filename}
+                  alt={photo.name || photo.filename || "Photography"}
                   className="w-full h-auto object-cover"
                   loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== "/placeholder.svg") {
+                      target.src = "/placeholder.svg";
+                    }
+                  }}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-urban-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">

@@ -73,8 +73,14 @@ export function PhotoDetailModal({ photo, isOpen, onClose, mode }: PhotoDetailMo
                         <div className="flex-1 flex items-center justify-center p-6 sm:p-8 md:p-12 overflow-hidden bg-background">
                             <img
                                 src={photo.url}
-                                alt={photo.name}
+                                alt={photo.name || "Photography"}
                                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    if (target.src !== "/placeholder.svg") {
+                                        target.src = "/placeholder.svg";
+                                    }
+                                }}
                             />
                         </div>
 

@@ -9,12 +9,14 @@ async function testFilters() {
     try {
         await client.connect();
 
-        console.log("--- Test 1: Search 'fundo' in Name/Desc/Category ---");
+        console.log("--- Test 1: Check Problematic URLs ---");
         const searchRes = await client.query(
-            "SELECT name, category, description, tags FROM photos WHERE (name ILIKE $1 OR description ILIKE $1 OR category ILIKE $1) ORDER BY created_at DESC",
-            ['%fundo%']
+            "SELECT id, name, url, filename FROM photos WHERE name = 'undefined' OR filename = 'undefined'"
         );
-        console.log(searchRes.rows);
+        console.log("Photos with 'undefined' as string:", searchRes.rows);
+
+        const allRes = await client.query("SELECT id, name, url FROM photos LIMIT 5");
+        console.log("First 5 photos:", allRes.rows);
 
         console.log("\n--- Test 2: Filter by 'nature' Category or Tag ---");
         const tagRes = await client.query(

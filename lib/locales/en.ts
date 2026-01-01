@@ -1,6 +1,6 @@
 export const en = {
     hero: {
-        title: "Anonymous Photographer",
+        title: "Silent Shutter",
         description: "Share your best photos anonymously. High-resolution gallery for everyone.",
         uploadBtn: "Upload your Photo"
     },
@@ -86,7 +86,7 @@ export const en = {
             },
             donation: {
                 title: "Like this photo?",
-                description: "Your donation helps the Anonymous Photographer to keep capturing incredible moments freely."
+                description: "Your donation helps Silent Shutter to keep capturing incredible moments freely."
             }
         }
     },
