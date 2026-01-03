@@ -27,5 +27,4 @@ yarn-error.log*
 *.tsbuildinfo
 
 # lock files
-package-lock.json
 pnpm-lock.yaml
