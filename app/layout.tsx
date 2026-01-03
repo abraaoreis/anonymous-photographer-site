@@ -3,7 +3,8 @@ import type { Metadata } from "next"
 import { Inter, Space_Grotesk, IBM_Plex_Mono, Playfair_Display, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import "tw-animate-css"
+
+
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "@/components/providers"
 import { ThemeToggle } from "@/components/theme-toggle"
