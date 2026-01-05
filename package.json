@@ -78,7 +78,6 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "daisyui": "^5.5.14",
     "env-cmd": "^11.0.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",

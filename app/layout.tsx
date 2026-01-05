@@ -1,4 +1,4 @@
-import type React from "react"
+import React, { type ReactNode } from "react"
 import type { Metadata } from "next"
 import { Inter, Space_Grotesk, IBM_Plex_Mono, Playfair_Display, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: ReactNode
 }>) {
   return (
     <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable} ${montserrat.variable}`} suppressHydrationWarning>

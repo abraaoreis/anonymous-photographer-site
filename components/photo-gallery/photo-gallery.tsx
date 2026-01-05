@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { Search, Upload, ImageIcon, Loader2, Download, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,9 +57,10 @@ export function PhotoGallery() {
             {t.hero.description}
           </p>
           <div className="mt-4">
-            <button className="btn bg-shadow-red hover:bg-[#C43F3F] border-none text-white rounded-[8px] font-sans px-8" onClick={() => setIsUploadModalOpen(true)}>
+            <Button className="bg-shadow-red hover:bg-[#C43F3F] border-none text-white rounded-[8px] font-sans px-8" onClick={() => setIsUploadModalOpen(true)}>
               <Upload className="w-5 h-5 mr-2" />
-              {t.hero.uploadBtn}</button>
+              {t.hero.uploadBtn}
+            </Button>
           </div>
         </div>
       </section>

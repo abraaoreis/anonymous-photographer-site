@@ -2,23 +2,24 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "develop"]
 
 jobs:
   build:
     name: Build and Lint
     runs-on: ubuntu-latest
-    environment: prod
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXT_PUBLIC_BASE_PATH: ${{ vars.NEXT_PUBLIC_BASE_PATH || '/silent-shutter' }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY }}
-      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-      DB_STRATEGY: ${{ secrets.DB_STRATEGY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_STORAGE_BUCKET: ${{ vars.SUPABASE_STORAGE_BUCKET || 'photos' }}
+      DB_STRATEGY: ${{ secrets.DB_STRATEGY || 'supabase' }}
+      NEXT_PUBLIC_STORAGE_URL: ${{ vars.NEXT_PUBLIC_STORAGE_URL }}
 
     steps:
       - name: Checkout code
@@ -36,12 +37,13 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo "DATABASE_URL=${DATABASE_URL}" >> .env
+          echo "NEXT_PUBLIC_BASE_PATH=${NEXT_PUBLIC_BASE_PATH}" >> .env
           echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" >> .env
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}" >> .env
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY}" >> .env
-          echo "BLOB_READ_WRITE_TOKEN=${BLOB_READ_WRITE_TOKEN}" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}" >> .env
+          echo "SUPABASE_STORAGE_BUCKET=${SUPABASE_STORAGE_BUCKET}" >> .env
           echo "DB_STRATEGY=${DB_STRATEGY}" >> .env
+          echo "NEXT_PUBLIC_STORAGE_URL=${NEXT_PUBLIC_STORAGE_URL}" >> .env
 
       - name: Build Application
         run: npm run build:prod
