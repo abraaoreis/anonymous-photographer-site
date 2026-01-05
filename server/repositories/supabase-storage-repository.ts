@@ -1,12 +1,25 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { IStorageRepository } from "./interfaces/storage-repository.interface"
 
 export class SupabaseStorageRepository implements IStorageRepository {
-    private supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    private _supabase: SupabaseClient | null = null
     private bucketName = process.env.SUPABASE_STORAGE_BUCKET || "photos"
+
+    private get supabase(): SupabaseClient {
+        if (!this._supabase) {
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+            const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
+                process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+            if (!supabaseUrl || !supabaseKey) {
+                throw new Error("Supabase configuration is missing (URL or Key)")
+            }
+
+            this._supabase = createClient(supabaseUrl, supabaseKey)
+        }
+        return this._supabase
+    }
 
     async upload(name: string, file: File): Promise<string> {
         // Create a unique path to avoid collisions

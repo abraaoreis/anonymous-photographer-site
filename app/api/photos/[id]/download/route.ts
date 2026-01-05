@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { PhotoService } from "@/server/services/photo-service"
 
+export const dynamic = "force-static"
+
+export async function generateStaticParams() {
+    return [{ id: 'dummy' }]
+}
+
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }

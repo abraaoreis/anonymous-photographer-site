@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
+
+export const dynamic = "force-static"
 import { UploadService } from "@/server/services/upload-service"
 
 export async function POST(request: NextRequest) {
